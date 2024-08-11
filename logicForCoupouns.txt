@@ -1,0 +1,24 @@
+  useEffect(() => {
+    // Load the coupon data from the JSON file
+    fetch('/coupons.json')
+      .then(response => response.json())
+      .then(data => setCoupons(data));
+  }, []);
+
+ const handleApplyCoupon = () => {
+    if (!appliedCoupon) return;
+
+    const coupon = coupons.find(c => c.code === appliedCoupon);
+
+    if (coupon) {
+      const totalAmount = calculateTotalAmount();
+      if (totalAmount >= coupon.minAmount) {
+        const discountAmount = (totalAmount * coupon.discountPercentage) / 100;
+        setDiscount(discountAmount);
+      } else {
+        alert(`This coupon requires a minimum purchase of $${coupon.minAmount}`);
+      }
+    } else {
+      alert('Invalid coupon code');
+    }
+  };

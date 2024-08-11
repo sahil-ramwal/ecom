@@ -1,0 +1,12 @@
+[
+  {
+    "code": "DISCOUNT10",
+    "discountPercentage": 10,
+    "minAmount": 0
+  },
+  {
+    "code": "SAVE20",
+    "discountPercentage": 20,
+    "minAmount": 1200
+  }
+]
