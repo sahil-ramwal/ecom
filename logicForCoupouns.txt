@@ -1,3 +1,22 @@
+// src/components/CartPage.tsx
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../store/store';
+import { clearCart } from '../store/cartSlice';
+
+interface Coupon {
+  code: string;
+  discountPercentage: number;
+  minAmount: number;
+}
+
+const CartPage: React.FC = () => {
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [discount, setDiscount] = useState<number>(0);
+  const cart = useSelector((state: RootState) => state.cart);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     // Load the coupon data from the JSON file
     fetch('/coupons.json')
@@ -5,7 +24,11 @@
       .then(data => setCoupons(data));
   }, []);
 
- const handleApplyCoupon = () => {
+  const calculateTotalAmount = () => {
+    return cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+
+  const handleApplyCoupon = () => {
     if (!appliedCoupon) return;
 
     const coupon = coupons.find(c => c.code === appliedCoupon);
@@ -22,3 +45,43 @@
       alert('Invalid coupon code');
     }
   };
+
+  const handlePlaceOrder = () => {
+    // Implement the logic for placing the order
+    alert('Order placed successfully');
+    dispatch(clearCart());
+  };
+
+  const totalAmount = calculateTotalAmount();
+  const finalAmount = totalAmount - discount;
+
+  return (
+    <div>
+      <h2>Cart</h2>
+      <ul>
+        {cart.items.map(item => (
+          <li key={item.id}>
+            {item.name} - ${item.price} x {item.quantity}
+          </li>
+        ))}
+      </ul>
+      <div>
+        <p>Total Amount: ${totalAmount.toFixed(2)}</p>
+        <p>Discount: ${discount.toFixed(2)}</p>
+        <p>Final Amount: ${finalAmount.toFixed(2)}</p>
+      </div>
+      <div>
+        <input
+          type="text"
+          placeholder="Enter coupon code"
+          value={appliedCoupon || ''}
+          onChange={e => setAppliedCoupon(e.target.value.toUpperCase())}
+        />
+        <button onClick={handleApplyCoupon}>Apply Coupon</button>
+      </div>
+      <button onClick={handlePlaceOrder}>Place Order</button>
+    </div>
+  );
+};
+
+export default CartPage;
